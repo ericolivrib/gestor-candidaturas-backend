@@ -44,9 +44,7 @@ export class JobApplicationsService {
     id: number,
     updateJobApplicationDto: JobApplicationRequestDto
   ) {
-    await this.getJobApplicationById(userId, id);
-
-    await this.prismaService.jobApplication.update({
+    const { count } = await this.prismaService.jobApplication.updateMany({
       data: {
         jobTitle: updateJobApplicationDto.jobTitle,
         companyName: updateJobApplicationDto.companyName,
@@ -57,6 +55,10 @@ export class JobApplicationsService {
         id
       }
     });
+
+    if (count == 0) {
+      throw new NotFoundException('Candidatura não encontrada');
+    }
   }
 
   async deleteJobApplication(userId: string, id: number) {
