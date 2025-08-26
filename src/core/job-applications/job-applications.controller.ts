@@ -1,4 +1,4 @@
-import { Body, Controller, HttpCode, HttpStatus, Logger, Post } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Logger, Post } from '@nestjs/common';
 import { JobApplicationsService } from './job-applications.service';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { AuthUserDto } from 'src/shared/dto/auth-user.dto';
@@ -20,5 +20,12 @@ export class JobApplicationsController {
   ) {
     this.logger.log('Criando aplicação de vaga');
     await this.jobApplicationsService.createJobApplication(user.id, jobApplicationDto);
+  }
+
+  @Get()
+  async getUserJobApplications(@CurrentUser() user: AuthUserDto) {
+    // TODO: Talvez implementar um cache
+    this.logger.log('Buscando vagas do usuário');
+    return await this.jobApplicationsService.getUserJobApplications(user.id);
   }
 }

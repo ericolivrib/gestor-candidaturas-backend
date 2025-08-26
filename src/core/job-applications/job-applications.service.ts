@@ -20,4 +20,12 @@ export class JobApplicationsService {
       }
     });
   }
+
+  async getUserJobApplications(userId: string) {
+    const jobApplications = await this.prismaService.jobApplication.findMany({
+      where: { userId }
+    })
+
+    return jobApplications;
+  }
 }
