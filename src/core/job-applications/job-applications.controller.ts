@@ -58,6 +58,7 @@ export class JobApplicationsController {
   }
 
   @Delete(':id')
+  @HttpCode(HttpStatus.NO_CONTENT)
   async deleteJobApplication(
     @CurrentUser() user: AuthUserDto,
     @Param('id', new ParseIntPipe()) id: number
