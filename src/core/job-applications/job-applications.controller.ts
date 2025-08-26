@@ -1,9 +1,9 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Logger, Param, ParseIntPipe, Post } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Logger, Param, ParseIntPipe, Post, Put } from '@nestjs/common';
 import { JobApplicationsService } from './job-applications.service';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { AuthUserDto } from 'src/shared/dto/auth-user.dto';
 import { ZodValidationPipe } from 'src/common/pipes/zod-validation.pipe';
-import { CreateJobApplicationDto, createJobApplicationSchema } from 'src/shared/dto/create-job-application.dto';
+import { JobApplicationRequestDto, jobApplicationRequestSchema } from 'src/shared/dto/job-application-request.dto';
 
 @Controller('v1/job-applications')
 export class JobApplicationsController {
@@ -15,8 +15,8 @@ export class JobApplicationsController {
   @HttpCode(HttpStatus.CREATED)
   async createJobApplication(
     @CurrentUser() user: AuthUserDto,
-    @Body(new ZodValidationPipe(createJobApplicationSchema))
-    jobApplicationDto: CreateJobApplicationDto
+    @Body(new ZodValidationPipe(jobApplicationRequestSchema))
+    jobApplicationDto: JobApplicationRequestDto
   ) {
     this.logger.log('Criando aplicação de vaga');
     await this.jobApplicationsService.createJobApplication(user.id, jobApplicationDto);
@@ -36,6 +36,18 @@ export class JobApplicationsController {
   ) {
     // TODO: Talvez implementar um cache
     this.logger.log('Buscando vagas do usuário');
-    return await this.jobApplicationsService.getJobApplicationById(id);
+    return await this.jobApplicationsService.getJobApplicationById(user.id, id);
+  }
+
+  @Put(':id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async updateJobApplication(
+    @CurrentUser() user: AuthUserDto,
+    @Param('id', new ParseIntPipe()) id: number,
+    @Body(new ZodValidationPipe(jobApplicationRequestSchema))
+    updateJobApplicationDto: JobApplicationRequestDto
+  ) {
+    this.logger.log(`Atualizando dados da vaga de ID ${id}`);
+    await this.jobApplicationsService.updateJobApplication(user.id, id, updateJobApplicationDto);
   }
 }

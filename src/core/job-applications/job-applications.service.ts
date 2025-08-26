@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateJobApplicationDto } from 'src/shared/dto/create-job-application.dto';
+import { JobApplicationRequestDto } from 'src/shared/dto/job-application-request.dto';
 
 @Injectable()
 export class JobApplicationsService {
@@ -8,7 +8,7 @@ export class JobApplicationsService {
     private readonly prismaService: PrismaService
   ) { }
 
-  async createJobApplication(userId: string, createJobApplicationDto: CreateJobApplicationDto) {
+  async createJobApplication(userId: string, createJobApplicationDto: JobApplicationRequestDto) {
     await this.prismaService.jobApplication.create({
       data: {
         jobTitle: createJobApplicationDto.jobTitle,
@@ -29,13 +29,33 @@ export class JobApplicationsService {
     return jobApplications;
   }
 
-  async getJobApplicationById(id: number) {
+  async getJobApplicationById(userId: string, id: number) {
     const jobApplication = await this.prismaService.jobApplication.findUniqueOrThrow({
-      where: { id }
+      where: { id, userId }
     }).catch(() => {
-      throw new NotFoundException(`Vaga não encontrada com o ID ${id}`);
+      throw new NotFoundException(`Vaga não encontrada`);
     });
 
     return jobApplication;
+  }
+
+  async updateJobApplication(
+    userId: string,
+    id: number,
+    updateJobApplicationDto: JobApplicationRequestDto
+  ) {
+    await this.getJobApplicationById(userId, id);
+
+    await this.prismaService.jobApplication.update({
+      data: {
+        jobTitle: updateJobApplicationDto.jobTitle,
+        companyName:  updateJobApplicationDto.companyName,
+        url: updateJobApplicationDto.url,
+        tags: updateJobApplicationDto.tags,
+      },
+      where: {
+        id
+      }
+    })
   }
 }
