@@ -49,13 +49,23 @@ export class JobApplicationsService {
     await this.prismaService.jobApplication.update({
       data: {
         jobTitle: updateJobApplicationDto.jobTitle,
-        companyName:  updateJobApplicationDto.companyName,
+        companyName: updateJobApplicationDto.companyName,
         url: updateJobApplicationDto.url,
         tags: updateJobApplicationDto.tags,
       },
       where: {
         id
       }
-    })
+    });
+  }
+
+  async deleteJobApplication(userId: string, id: number) {
+    const { count } = await this.prismaService.jobApplication.deleteMany({
+      where: { userId, id }
+    });
+
+    if (count == 0) {
+      throw new NotFoundException('Candidatura não encontrada');
+    }
   }
 }

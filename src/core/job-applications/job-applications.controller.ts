@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Logger, Param, ParseIntPipe, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Logger, Param, ParseIntPipe, Post, Put } from '@nestjs/common';
 import { JobApplicationsService } from './job-applications.service';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { AuthUserDto } from 'src/shared/dto/auth-user.dto';
@@ -49,5 +49,15 @@ export class JobApplicationsController {
   ) {
     this.logger.log(`Atualizando dados da vaga de ID ${id}`);
     await this.jobApplicationsService.updateJobApplication(user.id, id, updateJobApplicationDto);
+  }
+
+  @Delete(':id')
+  async deleteJobApplication(
+    @CurrentUser() user: AuthUserDto,
+    @Param('id', new ParseIntPipe()) id: number
+  ) {
+    // TODO: Talvez implementar um cache
+    this.logger.log('Deletando candidatura do usuário');
+    await this.jobApplicationsService.deleteJobApplication(user.id, id);
   }
 }
