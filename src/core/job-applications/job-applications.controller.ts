@@ -12,7 +12,7 @@ export class JobApplicationsController {
   constructor(private readonly jobApplicationsService: JobApplicationsService) { }
 
   @Post()
-  @HttpCode(HttpStatus.OK)
+  @HttpCode(HttpStatus.CREATED)
   async createJobApplication(
     @CurrentUser() user: AuthUserDto,
     @Body(new ZodValidationPipe(createJobApplicationSchema))
