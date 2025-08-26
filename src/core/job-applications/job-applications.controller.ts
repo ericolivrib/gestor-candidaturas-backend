@@ -4,6 +4,7 @@ import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { AuthUserDto } from 'src/shared/dto/auth-user.dto';
 import { ZodValidationPipe } from 'src/common/pipes/zod-validation.pipe';
 import { JobApplicationRequestDto, jobApplicationRequestSchema } from 'src/shared/dto/job-application-request.dto';
+import { JobApplication } from 'generated/prisma';
 
 @Controller('v1/job-applications')
 export class JobApplicationsController {
@@ -26,11 +27,12 @@ export class JobApplicationsController {
   async getUserJobApplications(
     @CurrentUser() user: AuthUserDto,
     @Query('page', new ParseIntPipe()) page: number = 1,
-    @Query('pageSize', new ParseIntPipe()) pageSize: number = 5
+    @Query('pageSize', new ParseIntPipe()) pageSize: number = 5,
+    @Query('orderBy') orderBy: keyof JobApplication = 'id'
   ) {
     // TODO: Talvez implementar um cache
     this.logger.log('Buscando candidaturas do usuário');
-    return await this.jobApplicationsService.getUserJobApplications(user.id, page, pageSize);
+    return await this.jobApplicationsService.getUserJobApplications(user.id, page, pageSize, orderBy);
   }
 
   @Get(':id')

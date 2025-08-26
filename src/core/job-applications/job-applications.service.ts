@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { JobApplication } from 'generated/prisma';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { JobApplicationRequestDto } from 'src/shared/dto/job-application-request.dto';
 
@@ -21,17 +22,23 @@ export class JobApplicationsService {
     });
   }
 
-  async getUserJobApplications(userId: string, page: number, pageSize: number) {
-    if (page <= 0) {
-      page = 1;
-    }
-    
+  async getUserJobApplications(userId: string, page: number, pageSize: number, orderBy: keyof JobApplication) {
+    if (page <= 0) page = 1;
     const skip = (page - 1) * pageSize;
+
+    const orderByFields = ['id', 'jobTitle', 'status', 'companyName', 'url']
+
+    if (!orderByFields.includes(orderBy)) {
+      orderBy = 'id';
+    }
 
     const jobApplications = await this.prismaService.jobApplication.findMany({
       where: { userId },
       skip,
       take: pageSize,
+      orderBy: {
+        [orderBy]: 'desc',
+      }
     })
 
     return jobApplications;
