@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateJobApplicationDto } from 'src/shared/dto/create-job-application.dto';
 
@@ -27,5 +27,15 @@ export class JobApplicationsService {
     })
 
     return jobApplications;
+  }
+
+  async getJobApplicationById(id: number) {
+    const jobApplication = await this.prismaService.jobApplication.findUniqueOrThrow({
+      where: { id }
+    }).catch(() => {
+      throw new NotFoundException(`Vaga não encontrada com o ID ${id}`);
+    });
+
+    return jobApplication;
   }
 }
