@@ -18,7 +18,7 @@ export class JobApplicationsController {
     @Body(new ZodValidationPipe(jobApplicationRequestSchema))
     jobApplicationDto: JobApplicationRequestDto
   ) {
-    this.logger.log('Criando aplicação de vaga');
+    this.logger.log('Criando candidatura');
     await this.jobApplicationsService.createJobApplication(user.id, jobApplicationDto);
   }
 
@@ -29,7 +29,7 @@ export class JobApplicationsController {
     @Query('pageSize', new ParseIntPipe()) pageSize: number = 5
   ) {
     // TODO: Talvez implementar um cache
-    this.logger.log('Buscando vagas do usuário');
+    this.logger.log('Buscando candidaturas do usuário');
     return await this.jobApplicationsService.getUserJobApplications(user.id, page, pageSize);
   }
 
@@ -39,7 +39,7 @@ export class JobApplicationsController {
     @Param('id', new ParseIntPipe()) id: number
   ) {
     // TODO: Talvez implementar um cache
-    this.logger.log('Buscando vagas do usuário');
+    this.logger.log(`Buscando candidatura do usuário pelo ID ${id}`);
     return await this.jobApplicationsService.getJobApplicationById(user.id, id);
   }
 
@@ -51,7 +51,7 @@ export class JobApplicationsController {
     @Body(new ZodValidationPipe(jobApplicationRequestSchema))
     updateJobApplicationDto: JobApplicationRequestDto
   ) {
-    this.logger.log(`Atualizando dados da vaga de ID ${id}`);
+    this.logger.log(`Atualizando dados da candidatura de ID ${id}`);
     await this.jobApplicationsService.updateJobApplication(user.id, id, updateJobApplicationDto);
   }
 

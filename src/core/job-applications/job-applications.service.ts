@@ -41,7 +41,7 @@ export class JobApplicationsService {
     const jobApplication = await this.prismaService.jobApplication.findUniqueOrThrow({
       where: { id, userId }
     }).catch(() => {
-      throw new NotFoundException(`Vaga não encontrada`);
+      throw new NotFoundException(`Candidatura não encontrada`);
     });
 
     return jobApplication;
