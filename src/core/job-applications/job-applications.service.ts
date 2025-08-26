@@ -21,9 +21,17 @@ export class JobApplicationsService {
     });
   }
 
-  async getUserJobApplications(userId: string) {
+  async getUserJobApplications(userId: string, page: number, pageSize: number) {
+    if (page <= 0) {
+      page = 1;
+    }
+    
+    const skip = (page - 1) * pageSize;
+
     const jobApplications = await this.prismaService.jobApplication.findMany({
-      where: { userId }
+      where: { userId },
+      skip,
+      take: pageSize,
     })
 
     return jobApplications;
