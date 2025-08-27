@@ -8,15 +8,18 @@ import { ConfigModule } from "@nestjs/config";
 import { CoreModule } from "./core/core.module";
 import serverConfig from "./common/config/server.config";
 import loggerConfig from "./common/config/logger.config";
+import { MulterModule } from "@nestjs/platform-express";
+import multerConfig from "./common/config/multer.config";
 
 @Module({
   imports: [
     PrismaModule,
     ConfigModule.forRoot({
-      load: [serverConfig],
+      load: [serverConfig, multerConfig],
       isGlobal: true,
     }),
     LoggerModule.forRootAsync(loggerConfig.asProvider()),
+    MulterModule.registerAsync(multerConfig.asProvider()),
     CoreModule,
   ],
   controllers: [AppController],

@@ -7,6 +7,7 @@ import { JobApplicationRequestDto, jobApplicationRequestSchema } from 'src/share
 import { JobApplication } from 'generated/prisma';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Response } from 'express';
+import multerConfig from 'src/common/config/multer.config';
 
 @Controller('v1/job-applications')
 export class JobApplicationsController {
@@ -72,7 +73,7 @@ export class JobApplicationsController {
 
   @Patch(':id/curriculum')
   @HttpCode(HttpStatus.NO_CONTENT)
-  @UseInterceptors(FileInterceptor('file'))
+  @UseInterceptors(FileInterceptor('file', multerConfig()))
   async uploadCurriculum(
     @CurrentUser() user: AuthUserDto,
     @Param('id', new ParseIntPipe()) id: number,

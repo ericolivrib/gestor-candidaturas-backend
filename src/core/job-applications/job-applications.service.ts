@@ -1,8 +1,7 @@
 import { ConflictException, Injectable, InternalServerErrorException, Logger, NotFoundException } from '@nestjs/common';
 import { JobApplication } from 'generated/prisma';
-import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { readFileSync, rmSync } from 'node:fs';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CURRICULUM_DIR } from 'src/shared/constants/static.constants';
 import { JobApplicationRequestDto } from 'src/shared/dto/job-application-request.dto';
 
 @Injectable()
@@ -93,30 +92,21 @@ export class JobApplicationsService {
   async uploadCurriculum(userId: string, id: number, file: Express.Multer.File) {
     const jobApplication = await this.getJobApplicationById(userId, id);
 
-    if (!existsSync(CURRICULUM_DIR)) {
-      mkdirSync(CURRICULUM_DIR);
-    }
-
-    const curriculumPath = `${CURRICULUM_DIR}/Curriculum${Date.now()}@${userId}.pdf`;
-
     await this.prismaService.$transaction(async (db) => {
-      await db.jobApplication.update({
-        data: { curriculumPath },
-        where: { userId, id },
-      })
-
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
-      writeFileSync(curriculumPath, file.buffer, {});
-
       if (jobApplication.curriculumPath != null) {
-        this.logger.warn('Removendo arquivo de currículo existente do disco');
+        this.logger.warn(`Removendo arquivo ${jobApplication.curriculumPath}`);
 
         try {
           rmSync(jobApplication.curriculumPath);
         } catch {
-          this.logger.warn('Arquivo de currículo não encontrado');
+          this.logger.warn(`Arquivo ${jobApplication.curriculumPath} não encontrado`);
         }
       }
+
+      await db.jobApplication.update({
+        data: { curriculumPath: file.path },
+        where: { userId, id },
+      });
     });
   }
 
