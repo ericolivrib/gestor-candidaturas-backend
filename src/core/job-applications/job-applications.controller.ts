@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Logger, Param, ParseIntPipe, Patch, Post, Put, Query, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Logger, Param, ParseIntPipe, Patch, Post, Put, Query, Res, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { JobApplicationsService } from './job-applications.service';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { AuthUserDto } from 'src/shared/dto/auth-user.dto';
@@ -6,6 +6,7 @@ import { ZodValidationPipe } from 'src/common/pipes/zod-validation.pipe';
 import { JobApplicationRequestDto, jobApplicationRequestSchema } from 'src/shared/dto/job-application-request.dto';
 import { JobApplication } from 'generated/prisma';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { Response } from 'express';
 
 @Controller('v1/job-applications')
 export class JobApplicationsController {
@@ -79,5 +80,22 @@ export class JobApplicationsController {
   ) {
     this.logger.log(`Armazenando currículo para a candidatura de ID ${id}`);
     await this.jobApplicationsService.uploadCurriculum(user.id, id, file);
+  }
+
+  @Get(':id/curriculum')
+  async getCurriculum(
+    @CurrentUser() user: AuthUserDto,
+    @Param('id', new ParseIntPipe()) id: number,
+    @Res() response: Response
+  ) {
+    this.logger.log(`Recuperando arquivo de currículo para a candidatura de ID ${id}`);
+    const file = await this.jobApplicationsService.getCurriculum(user.id, id);
+
+    response.set({
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': `inline; filename=curriculum.pdf`
+    })
+
+    response.send(file);
   }
 }
