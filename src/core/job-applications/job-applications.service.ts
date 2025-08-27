@@ -1,10 +1,14 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { JobApplication } from 'generated/prisma';
+import { existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { CURRICULUM_DIR } from 'src/shared/constants/static.constants';
 import { JobApplicationRequestDto } from 'src/shared/dto/job-application-request.dto';
 
 @Injectable()
 export class JobApplicationsService {
+  private readonly logger: Logger = new Logger(JobApplicationsService.name);
+
   constructor(
     private readonly prismaService: PrismaService
   ) { }
@@ -84,5 +88,30 @@ export class JobApplicationsService {
     if (count == 0) {
       throw new NotFoundException('Candidatura não encontrada');
     }
+  }
+
+  async uploadCurriculum(userId: string, id: number, file: Express.Multer.File) {
+    const jobApplication = await this.getJobApplicationById(userId, id);
+    
+    if (!existsSync(CURRICULUM_DIR)) {
+      mkdirSync(CURRICULUM_DIR);
+    }
+    
+    const curriculumPath = `${CURRICULUM_DIR}/Curriculum${Date.now()}@${userId}.pdf`;
+
+    await this.prismaService.$transaction(async (db) => {
+      await db.jobApplication.update({
+        data: { curriculumPath },
+        where: { userId, id },
+      })
+      
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
+      writeFileSync(curriculumPath, file.buffer, {});
+      
+      if (jobApplication.curriculumPath != null) {
+        this.logger.warn('Removendo arquivo de currículo existente do disco');
+        rmSync(jobApplication.curriculumPath);
+      }
+    });
   }
 }
