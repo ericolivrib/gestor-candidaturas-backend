@@ -1,1 +1,0 @@
-export const FILE_DESTINATION = 'src/static/uploads';
