@@ -70,7 +70,7 @@ export class JobApplicationsService {
         tags: updateJobApplicationDto.tags,
       },
       where: {
-        id
+        userId, id
       }
     });
 
