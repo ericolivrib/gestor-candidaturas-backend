@@ -1,5 +1,5 @@
 import { ConflictException, Injectable, InternalServerErrorException, Logger, NotFoundException } from '@nestjs/common';
-import { JobApplication } from 'generated/prisma';
+import { JobApplication, Status } from 'generated/prisma';
 import { readFileSync, rmSync } from 'node:fs';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { JobApplicationRequestDto } from 'src/shared/dto/job-application-request.dto';
@@ -127,6 +127,17 @@ export class JobApplicationsService {
       return file;
     } catch {
       throw new InternalServerErrorException('Falha ao recuperar o arquivo de currículo para esta candidatura');
+    }
+  }
+
+  async updateJobApplicationStatus(userId: string, id: number, status: Status) {
+    const { count } = await this.prismaService.jobApplication.updateMany({
+      data: { status },
+      where: { userId, id }
+    });
+
+    if (count == 0) {
+      throw new NotFoundException('Candidatura não encontrada');
     }
   }
 }
