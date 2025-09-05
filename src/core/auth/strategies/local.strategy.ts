@@ -16,8 +16,11 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
 
   async validate(email: string, password: string): Promise<AuthUserDto> {
     this.logger.log(`Tentativa de login com email ${email}`);
+    this.logger.debug(`Utilizando estratégia de validação local para o usuário com email ${email}`);
 
     const user = await this.authService.validateUser(email, password);
+
+    this.logger.debug(`Injetando usuário autenticado com email ${email} na requisição`);
     return user;
   }
 }
