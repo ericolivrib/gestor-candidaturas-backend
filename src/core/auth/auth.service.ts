@@ -34,7 +34,7 @@ export class AuthService {
       throw new UnauthorizedException('E-mail ou senha incorretos');
     }
 
-    this.logger.debug(`Usuário com email ${email} autenticado com sucesso`);
+    this.logger.debug(`Retornando usuário validado com email ${email}`);
     return authUserSchema.parse(user);
   }
 
