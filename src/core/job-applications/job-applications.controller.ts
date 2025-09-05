@@ -8,6 +8,7 @@ import { JobApplication } from 'generated/prisma';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Response } from 'express';
 import multerConfig from 'src/common/config/multer.config';
+import { JobApplicationStatusDto, jobApplicationStatusSchema } from 'src/shared/dto/update-job-application-status.dto';
 
 @Controller('v1/job-applications')
 export class JobApplicationsController {
@@ -98,5 +99,21 @@ export class JobApplicationsController {
     })
 
     response.send(file);
+  }
+
+  @Patch(':id/status')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async updateJobApplicationStatus(
+    @CurrentUser() user: AuthUserDto,
+    @Param('id', new ParseIntPipe()) id: number,
+    @Body(new ZodValidationPipe(jobApplicationStatusSchema))
+    updateStatusDto: JobApplicationStatusDto,
+  ) {
+    this.logger.log(`Atualizando status da candidatura de ID ${id}`);
+    await this.jobApplicationsService.updateJobApplicationStatus(
+      user.id,
+      id,
+      updateStatusDto.status
+    );
   }
 }

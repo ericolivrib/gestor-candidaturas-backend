@@ -5,8 +5,9 @@ import { diskStorage } from "multer";
 import { randomUUID } from "node:crypto";
 import { existsSync, mkdirSync } from "node:fs";
 import { extname } from "node:path";
-import { FILE_DESTINATION } from "src/shared/constants/file-destination";
 import { BadRequestException } from "@nestjs/common";
+
+export const FILE_DESTINATION = 'src/static/uploads';
 
 export default registerAs('multer', (): MulterModuleOptions => ({
   storage: diskStorage({
