@@ -23,7 +23,8 @@ export class ValidationExceptionFilter implements ExceptionFilter {
     const { fieldErrors } = z.flattenError(exception);
 
     response.status(status).send({
-      detail: 'Erro de validação',
+      title: 'Erro de validação',
+      details: 'Má formatação dos dados de entrada',
       status,
       timestamp: new Date().toISOString(),
       instance: request.url,
