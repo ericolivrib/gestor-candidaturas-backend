@@ -3,6 +3,7 @@ import { JobApplication, Status } from 'generated/prisma';
 import { readFileSync, rmSync } from 'node:fs';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { JobApplicationRequestDto } from 'src/shared/dto/job-application-request.dto';
+import { paginate } from 'src/shared/utils/pagination';
 
 @Injectable()
 export class JobApplicationsService {
@@ -53,11 +54,11 @@ export class JobApplicationsService {
 
     if (jobApplications.length === 0) {
       this.logger.debug(`Retornando lista vazia de candidaturas para o usuário ${userId}`);
-      return [];
+      return paginate<JobApplication>([], page, pageSize);
     }
 
     this.logger.debug(`Retornando ${jobApplications.length} candidaturas do usuário ${userId}`);
-    return jobApplications;
+    return paginate(jobApplications, page, pageSize);
   }
 
   async getJobApplicationById(userId: string, id: number) {
