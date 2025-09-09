@@ -10,12 +10,13 @@ import serverConfig from "./common/config/server.config";
 import loggerConfig from "./common/config/logger.config";
 import { MulterModule } from "@nestjs/platform-express";
 import multerConfig from "./common/config/multer.config";
+import corsConfig from "./common/config/cors.config";
 
 @Module({
   imports: [
     PrismaModule,
     ConfigModule.forRoot({
-      load: [serverConfig, multerConfig],
+      load: [serverConfig, multerConfig, corsConfig],
       isGlobal: true,
     }),
     LoggerModule.forRootAsync(loggerConfig.asProvider()),
