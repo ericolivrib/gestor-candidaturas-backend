@@ -7,9 +7,17 @@ import { existsSync, mkdirSync } from "node:fs";
 import { extname } from "node:path";
 import { BadRequestException } from "@nestjs/common";
 
-export const FILE_DESTINATION = 'src/static/uploads';
+const FILE_DESTINATION = 'src/static/uploads';
+
+/**
+ * Tamanho máximo do arquivo de PDF (5 mb)
+ */
+const MAX_FILE_SIZE = 5_242_880;
 
 export default registerAs('multer', (): MulterModuleOptions => ({
+  limits: {
+    fileSize: MAX_FILE_SIZE
+  },
   storage: diskStorage({
     destination(req, file, callback) {
       try {
