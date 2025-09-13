@@ -6,8 +6,7 @@ export interface Page<T> {
   pageSize: number;
 }
 
-export function paginate<T>(items: T[], currentPage: number, pageSize: number): Page<T> {
-  const totalItems = items.length;
+export function paginate<T>(items: T[], currentPage: number, pageSize: number, totalItems: number): Page<T> {
   const totalPages = Math.ceil(totalItems / pageSize);
   const startIndex = (currentPage - 1) * pageSize;
   const endIndex = startIndex + pageSize;

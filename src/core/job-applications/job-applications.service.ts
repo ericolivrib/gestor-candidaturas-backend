@@ -52,13 +52,17 @@ export class JobApplicationsService {
       }
     })
 
+    const totalCount = await this.prismaService.jobApplication.count({
+      where: { userId }
+    });
+
     if (jobApplications.length === 0) {
       this.logger.debug(`Retornando lista vazia de candidaturas para o usuário ${userId}`);
-      return paginate<JobApplication>([], page, pageSize);
+      return paginate<JobApplication>([], page, pageSize, totalCount);
     }
 
     this.logger.debug(`Retornando ${jobApplications.length} candidaturas do usuário ${userId}`);
-    return paginate(jobApplications, page, pageSize);
+    return paginate(jobApplications, page, pageSize, totalCount);
   }
 
   async getJobApplicationById(userId: string, id: number) {
